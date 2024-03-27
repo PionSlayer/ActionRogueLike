@@ -6,12 +6,11 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-
+#include "SInteractionComponent.h"
 
 
 ASCharacter::ASCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
@@ -20,10 +19,16 @@ ASCharacter::ASCharacter()
 	
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
-
-
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
+
+
+	AttackAnim = CreateDefaultSubobject<UAnimMontage>("AttackAnim");
+
+
+
+	InteractionComp = CreateDefaultSubobject<USInteractionComponent>("InteractionComp");
 	
 }
 void ASCharacter::BeginPlay()
@@ -32,6 +37,27 @@ void ASCharacter::BeginPlay()
 	
 }
 
+
+
+
+
+void ASCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAxis("MoveForward", this, &ASCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveSideways", this, &ASCharacter::MoveSideways);
+	
+	PlayerInputComponent->BindAxis("Turn", this, &ASCharacter::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &ASCharacter::AddControllerPitchInput);
+
+	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed,this, &ASCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("PrimaryInteract",IE_Pressed,this, &ASCharacter::PrimaryInteract);
+}
 
 void ASCharacter::MoveForward(float Value)
 {
@@ -52,6 +78,13 @@ void ASCharacter::MoveSideways(float Value)
 
 void ASCharacter::PrimaryAttack()
 {
+	PlayAnimMontage(AttackAnim);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this,&ASCharacter::PrimaryAttack_TimeElapsed, 0.2f);
+
+}
+
+void ASCharacter::PrimaryAttack_TimeElapsed()
+{
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 	
 	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
@@ -61,22 +94,11 @@ void ASCharacter::PrimaryAttack()
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }
 
-
-
-void ASCharacter::Tick(float DeltaTime)
+void ASCharacter::PrimaryInteract()
 {
-	Super::Tick(DeltaTime);
-
+	if(InteractionComp)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Interaction Called:3"));
+		InteractionComp->PrimaryInteract();
+	}
 }
-void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("MoveForward", this, &ASCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveSideways", this, &ASCharacter::MoveSideways);
-	
-	PlayerInputComponent->BindAxis("Turn", this, &ASCharacter::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("LookUp", this, &ASCharacter::AddControllerPitchInput);
-
-	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed,this, &ASCharacter::PrimaryAttack);
-}
-

@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SInteractionComponent.h"
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
 
 class UCameraComponent;
 class USpringArmComponent;
+class USInteractionComponent;
+class UAnimMontage;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASCharacter : public ACharacter
@@ -27,8 +30,16 @@ protected:
 	// Called when the game starts or when spawned
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
+	
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
+
+	UPROPERTY(VisibleAnywhere)
+	USInteractionComponent* InteractionComp;
+
+	UPROPERTY(EditAnywhere);
+	UAnimMontage* AttackAnim;
+	FTimerHandle TimerHandle_PrimaryAttack;
 	
 	virtual void BeginPlay() override;
 	void MoveForward(float Value);
@@ -36,7 +47,8 @@ protected:
 
 
 	void PrimaryAttack();
-	
+	void PrimaryAttack_TimeElapsed();
+	void PrimaryInteract();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
