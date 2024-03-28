@@ -28,21 +28,15 @@ void USInteractionComponent::PrimaryInteract()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Interaction Called:2"));
 	
-	//Get object type
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 
-
-	//Get origin of Line from Actor
 	AActor* MyOwner = GetOwner();
 	FVector EyeLocation;
 	FRotator EyeRotation; 
 	MyOwner ->GetActorEyesViewPoint(EyeLocation,EyeRotation);
 	FVector End = EyeLocation + (EyeRotation.Vector()* 200);
 
-	//Test if Hit
-	//FHitResult Hit;
-	//bool lineHit = GetWorld()->LineTraceSingleByObjectType(Hit,EyeLocation,End,ObjectQueryParams);
 	float radius = 50;
 	FCollisionShape Shape;
 	Shape.SetSphere(radius);
@@ -56,10 +50,8 @@ void USInteractionComponent::PrimaryInteract()
 		AActor* HitActor = Hit.GetActor();
 			if(HitActor)
         	{
-        		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Interaction Called:1"));
         		if(HitActor->Implements<USGamePlayInterface>())
         		{
-        			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Interaction Called:0"));
         			APawn* MyPawn = Cast<APawn>(MyOwner);
         			ISGamePlayInterface::Execute_Interact(HitActor,MyPawn);
         			break;
