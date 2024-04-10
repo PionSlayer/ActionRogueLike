@@ -22,7 +22,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UMaterial* Material;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	URadialForceComponent* RadialForceComponent;
 
 	UFUNCTION()

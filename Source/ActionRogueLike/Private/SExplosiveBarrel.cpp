@@ -41,12 +41,21 @@ void ASExplosiveBarrel::Tick(float DeltaTime)
 void ASExplosiveBarrel::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Colission"));
-
 	if(OtherComp->GetCollisionObjectType() == ECC_GameTraceChannel1)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("ColissionHit"));
 		Mesh->AddImpulse(OtherActor->GetVelocity()*1000);
 		RadialForceComponent->FireImpulse();
+
+		// %s == string
+		// %f == float
+		
+		
+		UE_LOG(LogTemp, Warning,TEXT("OtherActor: %s, at game time: %f"),*GetNameSafe(OtherActor),GetWorld()->TimeSeconds);
+		UE_LOG(LogTemp, Log,TEXT("OtherActor: %s, at game time: %f"),*GetNameSafe(OtherActor),GetWorld()->TimeSeconds);
+		UE_LOG(LogTemp, Error,TEXT("OtherActor: %s, at game time: %f"),*GetNameSafe(OtherActor),GetWorld()->TimeSeconds);
+
+
+		FString CombineString = FString::Printf(TEXT("BOOM"));
+		DrawDebugString(GetWorld(),Hit.ImpactPoint,CombineString,nullptr,FColor::Green,2.0f,true);
 	}
 }

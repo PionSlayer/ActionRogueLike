@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SInteractionComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 ASCharacter::ASCharacter()
@@ -51,6 +52,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveSideways", this, &ASCharacter::MoveSideways);
+	PlayerInputComponent->BindAction("Jump",IE_Pressed,this, &ACharacter::Jump);
 	
 	PlayerInputComponent->BindAxis("Turn", this, &ASCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &ASCharacter::AddControllerPitchInput);
@@ -78,16 +80,45 @@ void ASCharacter::MoveSideways(float Value)
 
 void ASCharacter::PrimaryAttack()
 {
-	PlayAnimMontage(AttackAnim);
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this,&ASCharacter::PrimaryAttack_TimeElapsed, 0.2f);
-
+	if(ensure(ProjectileClass))
+	{
+		PlayAnimMontage(AttackAnim);
+		GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this,&ASCharacter::PrimaryAttack_TimeElapsed, 0.2f);
+	}
 }
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
+
+	FVector start = CameraComp->GetComponentLocation();
+	FRotator direction = GetControlRotation();
+	FVector end = start + (direction.Vector()*1000);
+
+	FCollisionObjectQueryParams params;
+	params.AddObjectTypesToQuery(ECC_WorldDynamic);
+
+	FHitResult Hit;
+	GetWorld()->LineTraceSingleByObjectType(Hit,start,end,params);
+
+	FVector hitLocation;
+	AActor* HitActor = Hit.GetActor();
+	if(HitActor)
+	{
+		hitLocation=Hit.ImpactPoint;
+	}
+	else
+	{
+		hitLocation = end;
+	}
+
+	DrawDebugSphere(GetWorld(),hitLocation,5,32,FColor::Red,false,2,0,2);
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+
 	
-	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+	
+	
+	
+	FTransform SpawnTM = FTransform(UKismetMathLibrary::FindLookAtRotation(HandLocation,hitLocation), HandLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Instigator = this;
