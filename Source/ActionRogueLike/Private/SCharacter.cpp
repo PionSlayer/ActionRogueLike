@@ -23,14 +23,10 @@ ASCharacter::ASCharacter()
 	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
-
-
 	AttackAnim = CreateDefaultSubobject<UAnimMontage>("AttackAnim");
-
-
-
 	InteractionComp = CreateDefaultSubobject<USInteractionComponent>("InteractionComp");
 	
+	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 }
 void ASCharacter::BeginPlay()
 {

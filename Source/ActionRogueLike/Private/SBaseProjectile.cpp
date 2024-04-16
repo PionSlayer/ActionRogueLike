@@ -18,7 +18,7 @@ ASBaseProjectile::ASBaseProjectile()
 
 	Particle = CreateDefaultSubobject<UParticleSystemComponent>("Particle");
 	Particle -> SetupAttachment(SphereComp);
-
+	
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("Projectile");
 	ProjectileMovement -> ProjectileGravityScale = 0.0f;
 	ProjectileMovement -> InitialSpeed = Speed;
@@ -57,6 +57,12 @@ void ASBaseProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAct
 {
 }
 
+
 void ASBaseProjectile::OnOverlap(UPrimitiveComponent* HitComponent,AActor* OtherActor, UPrimitiveComponent* OtherComponent,int32 otherBodyIndex, bool fromSweep, const FHitResult& Overlap)
 {
+}
+
+void ASBaseProjectile::UseOnOverlap()
+{
+	SphereComp -> OnComponentBeginOverlap.AddDynamic(this,&ASBaseProjectile::OnOverlap);
 }

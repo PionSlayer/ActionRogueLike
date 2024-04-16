@@ -35,6 +35,8 @@ protected:
 	UParticleSystemComponent* Particle;
 
 
+
+
 	virtual void BeginPlay() override;
 	
 public:	
@@ -44,6 +46,6 @@ public:
 	virtual	void OnHit(UPrimitiveComponent* HitComponent,AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION()
 	virtual	void OnOverlap(UPrimitiveComponent* HitComponent,AActor* OtherActor, UPrimitiveComponent* OtherComponent,int32 otherBodyIndex, bool fromSweep, const FHitResult& Overlap);
-    	
+    virtual void UseOnOverlap();	
 
 };

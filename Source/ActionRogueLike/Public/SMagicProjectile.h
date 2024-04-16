@@ -16,11 +16,14 @@ class ACTIONROGUELIKE_API ASMagicProjectile : public ASBaseProjectile
 	
 public:	
 	ASMagicProjectile();
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ParticleSystem;
 
 protected:
 	virtual void BeginPlay() override;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-
+	virtual void OnOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 otherBodyIndex, bool fromSweep, const FHitResult& Overlap) override;
+	
 };
